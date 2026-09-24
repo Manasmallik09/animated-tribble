@@ -4,22 +4,580 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#030712">
-  <meta name="description" content="Manas Mallik — Mechanical Design Engineer specializing in Aerospace & UAV Systems, CAD, FEA, CFD, DFM and GD&T.">
-  <meta property="og:title" content="Manas Mallik | Aerospace & UAV Systems Design Engineer">
-  <meta property="og:description" content="Mechanical design, structural packaging, CFD/FEA analysis and aerospace engineering portfolio.">
-  <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
-  <link rel="stylesheet" href="styles.css">
-  <title>Manas Mallik | Mechanical Design Engineer</title>
+  <title>Manas Mallik | Mechanical Design & CAE Engineer</title>
+  
+  <style>
+    /* ==========================================================================
+       1. CORE DESIGN SYSTEM & DARK HUD THEME
+       ========================================================================== */
+    :root {
+      --bg-dark: #030712;
+      --bg-card: #071526;
+      --bg-card-hover: #0d2138;
+      --border-line: rgba(39, 199, 255, 0.2);
+      --border-line-light: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f8fc;
+      --text-muted: #91a8ba;
+      --gold: #ffbf3f;
+      --cyan: #27c7ff;
+      --green: #39e0a4;
+      --max-width: 1280px;
+      --radius: 12px;
+      --shadow-hud: 0 10px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Background Dynamic Interactive Canvas */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #mouse-glow {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(39, 199, 255, 0.06),
+        transparent 80%
+      );
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+
+    /* ==========================================================================
+       2. NAVIGATION BAR
+       ========================================================================== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(3, 7, 18, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-line);
+      height: 70px;
+    }
+
+    .nav-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255, 191, 63, 0.25), rgba(39, 199, 255, 0.25));
+      border: 1px solid var(--gold);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: var(--gold);
+      font-size: 15px;
+      letter-spacing: 1px;
+    }
+
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #fff; }
+    .brand-title { font-size: 10px; color: var(--text-muted); }
+
+    .nav-menu { display: flex; gap: 28px; }
+    .nav-link { font-size: 13px; color: var(--text-muted); transition: color 0.2s; font-weight: 500; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn.primary-gold {
+      background: var(--gold);
+      color: #030712;
+      border: none;
+    }
+    .btn.primary-gold:hover {
+      background: #ffa800;
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 191, 63, 0.4);
+    }
+
+    .btn.outline-gold {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+    }
+    .btn.outline-gold:hover {
+      background: rgba(255, 191, 63, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .btn.outline-sm {
+      background: transparent;
+      border: 1px solid var(--border-line);
+      color: var(--text-main);
+    }
+    .btn.outline-sm:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ==========================================================================
+       3. HERO SECTION & CAD VIEWPORT
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      z-index: 2;
+      padding: 65px 24px;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .hero-container {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .kicker {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: clamp(38px, 5vw, 64px);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 10px;
+    }
+    .hero-title .highlight { color: var(--gold); }
+
+    .hero-subtitle {
+      font-size: 20px;
+      color: var(--cyan);
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .hero-description {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 560px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .hero-cta { display: flex; gap: 14px; margin-bottom: 36px; flex-wrap: wrap; }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      border-top: 1px solid var(--border-line-light);
+      padding-top: 24px;
+    }
+
+    .metric-item strong { display: block; font-size: 15px; color: var(--gold); line-height: 1.2; }
+    .metric-item small { color: var(--text-muted); font-size: 11px; }
+
+    .hero-visual {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-hud);
+    }
+
+    .hud-top-right { text-align: right; margin-bottom: 12px; }
+    .hud-label { display: block; font-size: 11px; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
+    .hud-sub { font-size: 9px; color: var(--text-muted); }
+
+    .cad-viewport {
+      position: relative;
+      height: 310px;
+      background: #020912;
+      border: 1px dashed var(--border-line);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(39, 199, 255, 0.08) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(39, 199, 255, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      z-index: 2;
+    }
+
+    .viewport-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hud-tags {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 3;
+    }
+
+    .hud-tag {
+      background: rgba(3, 7, 18, 0.88);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 3px 8px;
+      font-size: 9px;
+      font-weight: 800;
+      border-radius: 4px;
+    }
+
+    /* Quick Photo Quick-Loader HUD Banner */
+    .photo-helper-bar {
+      background: rgba(255, 191, 63, 0.08);
+      border: 1px dashed var(--gold);
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 12px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ==========================================================================
+       4. SECTIONS & MECHANICAL PROJECTS GRID
+       ========================================================================== */
+    .section { position: relative; z-index: 2; padding: 60px 24px; }
+    .section-container { max-width: var(--max-width); margin: 0 auto; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .section-title-wrap { display: flex; align-items: center; gap: 12px; }
+    .hud-line { width: 24px; height: 3px; background: var(--gold); }
+    .section-header h2 { font-size: 24px; font-weight: 800; }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .project-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, background-color 0.25s;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--cyan);
+      background-color: var(--bg-card-hover);
+    }
+
+    .project-thumb {
+      height: 200px;
+      position: relative;
+      background: #040e1a;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-line-light);
+    }
+
+    .project-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .project-card:hover .project-img {
+      transform: scale(1.05);
+    }
+
+    .thumb-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(3, 7, 18, 0.85);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      z-index: 3;
+      transition: all 0.2s;
+    }
+
+    .thumb-btn:hover {
+      background: var(--gold);
+      color: #030712;
+    }
+
+    .project-info { padding: 22px; }
+    .project-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+    .project-info p { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(39, 199, 255, 0.1);
+      color: var(--cyan);
+      border: 1px solid rgba(39, 199, 255, 0.2);
+    }
+
+    /* Inline Local Photo Input Buttons for On-the-Fly Uploads */
+    .photo-upload-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 4;
+      background: rgba(3, 7, 18, 0.85);
+      border: 1px solid var(--border-line);
+      color: var(--text-muted);
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .photo-upload-label:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* ==========================================================================
+       5. SKILLS GRID & WORKFLOW
+       ========================================================================== */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+    }
+
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .skill-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .skill-icon { font-size: 32px; margin-bottom: 12px; }
+    .skill-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .skill-card small { font-size: 11px; color: var(--text-muted); }
+
+    .workflow-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+
+    .workflow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .flow-step { text-align: center; flex: 1; min-width: 140px; }
+    .step-icon { font-size: 26px; margin-bottom: 8px; }
+    .flow-step h4 { font-size: 13px; font-weight: 700; }
+    .flow-step p { font-size: 11px; color: var(--text-muted); }
+    .flow-arrow { color: var(--gold); font-size: 20px; font-weight: 900; }
+
+    /* ==========================================================================
+       6. THREE-COLUMN TIMELINE (EXPERIENCE, EDUCATION, CERTIFICATIONS)
+       ========================================================================== */
+    .three-col-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .col-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .col-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .col-icon { font-size: 20px; }
+    .col-header h3 { font-size: 16px; font-weight: 800; }
+
+    .timeline-list { display: flex; flex-direction: column; gap: 20px; }
+    .timeline-entry { position: relative; padding-left: 16px; }
+
+    .entry-bullet {
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    .entry-details h4 { font-size: 13px; font-weight: 700; }
+    .entry-role { font-size: 11px; color: var(--text-main); }
+    .entry-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .entry-date { font-size: 10px; color: var(--cyan); display: block; margin-top: 2px; }
+    .entry-highlight { font-size: 11px; color: var(--gold); font-weight: 800; display: block; margin-top: 2px; }
+
+    /* ==========================================================================
+       7. FOOTER & MODAL
+       ========================================================================== */
+    .footer-section {
+      border-top: 1px solid var(--border-line);
+      padding: 40px 24px;
+      position: relative;
+      z-index: 2;
+      background: #02050c;
+    }
+
+    .footer-container { max-width: var(--max-width); margin: 0 auto; }
+    .quote-banner { text-align: center; font-size: 12px; color: var(--gold); letter-spacing: 2px; margin-bottom: 28px; }
+    .footer-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .footer-brand { display: flex; align-items: center; gap: 12px; }
+    .footer-brand strong { display: block; font-size: 13px; }
+    .footer-brand p { font-size: 11px; color: var(--text-muted); }
+
+    .footer-links { display: flex; gap: 20px; font-size: 12px; }
+    .footer-links a { color: var(--text-muted); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-copy {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-line-light);
+      padding-top: 16px;
+    }
+
+    /* Scroll Animations & Dynamic Modal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .modal.open { display: grid; }
+
+    .modal-card {
+      width: min(720px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--cyan);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: var(--shadow-hud);
+    }
+
+    .modal-img-container {
+      width: 100%;
+      height: 280px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 1px solid var(--border-line);
+    }
+
+    .modal-img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-close { float: right; background: none; border: 0; color: #fff; font-size: 26px; cursor: pointer; }
+
+    @media (max-width: 992px) {
+      .hero-container { grid-template-columns: 1fr; }
+      .three-col-grid { grid-template-columns: 1fr; }
+      .nav-menu { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-metrics { grid-template-columns: repeat(2, 1fr); }
+      .workflow-steps { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
 </head>
 <body>
-  <!-- Canvas for interactive CAD network -->
+
+  <!-- Dynamic Interactive CAD Grid Background Canvas -->
   <canvas id="bg-canvas"></canvas>
   <div id="mouse-glow"></div>
 
-  <a class="skip-link" href="#main-content">Skip to content</a>
-
-  <!-- Navigation Bar -->
+  <!-- Top Navigation Header -->
   <header class="navbar">
     <div class="nav-container">
       <a href="#home" class="brand">
@@ -38,488 +596,494 @@
         <a href="#contact" class="nav-link">Contact</a>
       </nav>
       <div class="nav-actions">
+        <!-- EDITABLE RESUME LINK: Replace 'resume.pdf' with your PDF path -->
         <a href="resume.pdf" download class="btn outline-sm">
           <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           Download CV
         </a>
-        <button class="theme-toggle" aria-label="Toggle theme">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        </button>
       </div>
     </div>
   </header>
 
-  <main id="main-content">
+  <main>
     <!-- Hero Section -->
     <section class="hero-section" id="home">
       <div class="hero-container">
         <div class="hero-content reveal">
-          <div class="kicker">MECHANICAL DESIGN ENGINEER</div>
+          <div class="kicker">MECHANICAL DESIGN & CAE ENGINEER</div>
           <h1 class="hero-title">Manas <span class="highlight">Mallik</span></h1>
-          <h2 class="hero-subtitle">Aerospace & UAV Systems</h2>
+          <h2 class="hero-subtitle">CAD • Structural FEA • Thermal CFD • DFM</h2>
           <p class="hero-description">
-            I design, analyze and build mechanical systems for next-generation aerial platforms. From concept to manufacturing, I focus on precision, performance and real-world impact.
+            Mechanical engineer specializing in SolidWorks 3D parametric design, Creo mold tooling, ANSYS finite element analysis, high-pressure CFD modeling, and precision DFM/GD&T production standards.
           </p>
           <div class="hero-cta">
-            <a href="#projects" class="btn primary-gold">View My Projects →</a>
-            <a href="resume.pdf" download class="btn outline-gold">
-              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              Download Resume
-            </a>
+            <a href="#projects" class="btn primary-gold">View Project CAD Renders →</a>
+            <a href="resume.pdf" download class="btn outline-gold">Download Resume</a>
           </div>
+          
           <div class="hero-metrics">
             <div class="metric-item">
-              <span class="metric-icon">📅</span>
               <div>
-                <strong>1+</strong>
-                <small>Year Experience</small>
+                <strong>SolidWorks</strong>
+                <small>CSWA & CSWP Certified</small>
               </div>
             </div>
             <div class="metric-item">
-              <span class="metric-icon">💼</span>
               <div>
-                <strong>3+</strong>
-                <small>Major Projects</small>
+                <strong>ANSYS / CAE</strong>
+                <small>FEA Stress & CFD</small>
               </div>
             </div>
             <div class="metric-item">
-              <span class="metric-icon">🏆</span>
+              <div>
+                <strong>DFM / GD&T</strong>
+                <small>ASME Y14.5 Standard</small>
+              </div>
+            </div>
+            <div class="metric-item">
               <div>
                 <strong>AIR 1</strong>
-                <small>SAE DDC 2025</small>
-              </div>
-            </div>
-            <div class="metric-item">
-              <span class="metric-icon">⚙️</span>
-              <div>
-                <strong>5+</strong>
-                <small>Tools & Tech</small>
+                <small>Design Challenge</small>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Futuristic CAD Blueprint Jet Engine Visual -->
+        <!-- HERO PHOTO FRAME / CAD VIEWPORT SLOT -->
         <div class="hero-visual reveal">
           <div class="hud-top-right">
-            <span class="hud-label">AEROSPACE SYSTEMS</span>
-            <span class="hud-sub">DESIGN / ANALYSE / VALIDATE / MANUFACTURE</span>
+            <span class="hud-label">MECHANICAL CAD VIEWPORT</span>
+            <span class="hud-sub">SOLIDWORKS / ANSYS / CREO / TOOLING</span>
           </div>
+          
           <div class="cad-viewport">
             <div class="grid-overlay"></div>
-            <div class="engine-graphic">
-              <svg viewBox="0 0 500 300" class="cad-svg">
-                <g class="cad-lines" stroke="#27c7ff" stroke-width="1" fill="none" opacity="0.8">
-                  <!-- Outer Housing -->
-                  <path d="M 50,150 Q 80,60 200,50 L 400,70 L 450,110 L 450,190 L 400,230 L 200,250 Q 80,240 50,150 Z" stroke-dasharray="4 2"/>
-                  <circle cx="200" cy="150" r="90" stroke="#ffbf3f" stroke-width="1.5"/>
-                  <circle cx="200" cy="150" r="70" stroke="#27c7ff"/>
-                  <circle cx="200" cy="150" r="40" stroke="#27c7ff" stroke-dasharray="2 2"/>
-                  <!-- Turbine Blades -->
-                  <line x1="200" y1="60" x2="200" y2="240" stroke="#ffbf3f"/>
-                  <line x1="110" y1="150" x2="290" y2="150" stroke="#ffbf3f"/>
-                  <line x1="136" y1="86" x2="264" y2="214"/>
-                  <line x1="136" y1="214" x2="264" y2="86"/>
-                  <!-- Structural Exhaust Cones -->
-                  <path d="M 320,80 L 440,110 L 440,190 L 320,220 Z"/>
-                  <path d="M 350,90 L 470,130 L 470,170 L 350,210 Z" stroke="#ffbf3f" stroke-width="0.8"/>
-                  <line x1="50" y1="150" x2="470" y2="150" stroke="#ff667a" stroke-dasharray="6 3"/>
-                </g>
-              </svg>
-            </div>
+            
+            <!-- ================= EDITABLE PHOTO #1 (HERO IMAGE) ================= -->
+            <!-- Instructions: Replace 'images/hero-assembly.jpg' with your photo URL or file path -->
+            <img 
+              id="hero-photo"
+              src="images/hero-assembly.jpg" 
+              alt="Mechanical CAD Assembly Render" 
+              class="viewport-img"
+              onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Mechanical+CAD+Assembly+Render'"
+            />
+            
+            <label class="photo-upload-label">
+              📷 Load Local Photo
+              <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'hero-photo')">
+            </label>
+
             <div class="hud-tags">
-              <div class="hud-tag">CAD</div>
-              <div class="hud-tag">FEA</div>
-              <div class="hud-tag">CFD</div>
-              <div class="hud-tag">DFM</div>
+              <div class="hud-tag">SOLIDWORKS</div>
+              <div class="hud-tag">ANSYS FEA</div>
+              <div class="hud-tag">GD&T Y14.5</div>
+              <div class="hud-tag">MOLD TOOLING</div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Featured Projects Section -->
+    <!-- Mechanical Projects Section -->
     <section class="section" id="projects">
       <div class="section-container">
+        
+        <div class="photo-helper-bar">
+          <span>💡 <strong>Quick Photo Tester:</strong> Click <em>"📷 Load Local Photo"</em> on any project card below to instantly preview your CAD renders right inside your browser!</span>
+        </div>
+
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="hud-line"></span>
-            <h2>Featured Projects</h2>
+            <h2>Mechanical Design Projects & Case Studies</h2>
           </div>
-          <a href="#projects" class="section-link">View All Projects →</a>
         </div>
 
         <div class="projects-grid">
-          <!-- Project 1 -->
+          
+          <!-- PROJECT 1: MOLD TOOLING -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <div class="thumb-canvas drone-bg">
-                <svg viewBox="0 0 200 120" width="100%" height="100%">
-                  <path d="M 40,60 L 160,60 M 100,20 L 100,100 M 50,30 L 150,90 M 50,90 L 150,30" stroke="#27c7ff" stroke-width="1.5" fill="none"/>
-                  <circle cx="50" cy="30" r="15" stroke="#ffbf3f" fill="none"/>
-                  <circle cx="150" cy="30" r="15" stroke="#ffbf3f" fill="none"/>
-                  <circle cx="50" cy="90" r="15" stroke="#ffbf3f" fill="none"/>
-                  <circle cx="150" cy="90" r="15" stroke="#ffbf3f" fill="none"/>
-                  <rect x="85" y="45" width="30" height="30" rx="6" fill="#0d2233" stroke="#27c7ff"/>
-                </svg>
-              </div>
-              <button class="thumb-btn" data-project="uav" aria-label="Open case study">↗</button>
+              <!-- ================= EDITABLE PHOTO #2 ================= -->
+              <img 
+                id="p1-photo"
+                src="images/injection-mold.jpg" 
+                alt="Plastic Injection Mold Design" 
+                class="project-img"
+                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Injection+Mold+Tooling+CAD'"
+              />
+              <label class="photo-upload-label">
+                📷 Load Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p1-photo')">
+              </label>
+              <button class="thumb-btn" onclick="openCase('mold')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
-              <h3>UAV — Mechanical Packaging</h3>
-              <p>Structural assemblies, sheet-metal enclosures, DFM/GD&T, BOMs, prototypes and verification testing.</p>
+              <h3>Plastic Injection Hand Mold Design</h3>
+              <p>Core and cavity block extraction in Creo, runner/gate calculations, CNC toolpath generation, and DFMEA documentation.</p>
               <div class="tags">
-                <span class="tag">DESIGN</span>
-                <span class="tag">ASSEMBLY</span>
+                <span class="tag">PTC CREO</span>
+                <span class="tag">MOLD TOOLING</span>
                 <span class="tag">DFM</span>
-                <span class="tag">GD&T</span>
+                <span class="tag">CNC</span>
               </div>
             </div>
           </article>
 
-          <!-- Project 2 -->
+          <!-- PROJECT 2: DRDO SHOCKWAVE CFD -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <div class="thumb-canvas plane-bg">
-                <svg viewBox="0 0 200 120" width="100%" height="100%">
-                  <path d="M 20,60 Q 90,40 180,60 Q 90,80 20,60 Z" stroke="#27c7ff" stroke-width="1.5" fill="none"/>
-                  <path d="M 80,20 L 120,60 L 80,100" stroke="#ffbf3f" stroke-width="1.5" fill="none"/>
-                  <line x1="160" y1="40" x2="190" y2="10" stroke="#27c7ff"/>
-                  <line x1="160" y1="80" x2="190" y2="110" stroke="#27c7ff"/>
-                </svg>
-              </div>
-              <button class="thumb-btn" data-project="sae" aria-label="Open case study">↗</button>
+              <!-- ================= EDITABLE PHOTO #3 ================= -->
+              <img 
+                id="p2-photo"
+                src="images/drdo-shockwave.jpg" 
+                alt="DRDO Pressure Shockwave Simulation" 
+                class="project-img"
+                onerror="this.src='https://via.placeholder.com/600x400/071526/071526/27c7ff?text=DRDO+Shockwave+CFD+Model'"
+              />
+              <label class="photo-upload-label">
+                📷 Load Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p2-photo')">
+              </label>
+              <button class="thumb-btn" onclick="openCase('drdo')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
-              <h3>SAE DDC 2025 — Fixed-Wing UAV</h3>
-              <p>SolidWorks system architecture, rapid prototyping, FEA-based analysis. Team Aerotech — AIR 1 for Best Design Report.</p>
+              <h3>High-Pressure Flow & Shockwave Modeling</h3>
+              <p>High-displacement fluid dynamics analysis and physical CAD test rig design developed during DRDO research internship.</p>
               <div class="tags">
-                <span class="tag">CAD</span>
-                <span class="tag">ASSEMBLY</span>
-                <span class="tag">FEA</span>
+                <span class="tag">DRDO</span>
+                <span class="tag">CFD</span>
+                <span class="tag">THERMAL/FLUIDS</span>
+                <span class="tag">SOLIDWORKS</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 3: STRUCTURAL FEA & OPTIMIZATION -->
+          <article class="project-card reveal">
+            <div class="project-thumb">
+              <!-- ================= EDITABLE PHOTO #4 ================= -->
+              <img 
+                id="p3-photo"
+                src="images/fea-analysis.jpg" 
+                alt="ANSYS FEA Structural Stress Analysis" 
+                class="project-img"
+                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=ANSYS+FEA+Stress+Analysis'"
+              />
+              <label class="photo-upload-label">
+                📷 Load Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p3-photo')">
+              </label>
+              <button class="thumb-btn" onclick="openCase('fea')" aria-label="Open project case study">↗</button>
+            </div>
+            <div class="project-info">
+              <h3>Structural FEA & Weight Optimization</h3>
+              <p>ANSYS Workbench static structural & modal analysis. Topology optimization reduced component weight by 18% safely.</p>
+              <div class="tags">
+                <span class="tag">ANSYS FEA</span>
+                <span class="tag">ALTAIR</span>
+                <span class="tag">OPTIMIZATION</span>
+                <span class="tag">MESHING</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 4: MECHANICAL PACKAGING & SHEET METAL -->
+          <article class="project-card reveal">
+            <div class="project-thumb">
+              <!-- ================= EDITABLE PHOTO #5 ================= -->
+              <img 
+                id="p4-photo"
+                src="images/mechanical-enclosure.jpg" 
+                alt="Sheet Metal Mechanical Enclosure" 
+                class="project-img"
+                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Mechanical+Packaging+Enclosure'"
+              />
+              <label class="photo-upload-label">
+                📷 Load Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p4-photo')">
+              </label>
+              <button class="thumb-btn" onclick="openCase('packaging')" aria-label="Open project case study">↗</button>
+            </div>
+            <div class="project-info">
+              <h3>Mechanical Packaging & Enclosure</h3>
+              <p>Sheet metal chassis design, structural packaging, fastener selection, and ASME Y14.5 GD&T tolerance stack-up analysis.</p>
+              <div class="tags">
+                <span class="tag">SOLIDWORKS</span>
+                <span class="tag">SHEET METAL</span>
+                <span class="tag">GD&T</span>
+                <span class="tag">BOM</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 5: SAEINDIA DDC MECHANISM DESIGN -->
+          <article class="project-card reveal">
+            <div class="project-thumb">
+              <!-- ================= EDITABLE PHOTO #6 ================= -->
+              <img 
+                id="p5-photo"
+                src="images/sae-mechanism.jpg" 
+                alt="SAE Kinematic Mechanism Assembly" 
+                class="project-img"
+                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=SAE+Mechanism+%26+Chassis+CAD'"
+              />
+              <label class="photo-upload-label">
+                📷 Load Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p5-photo')">
+              </label>
+              <button class="thumb-btn" onclick="openCase('sae')" aria-label="Open project case study">↗</button>
+            </div>
+            <div class="project-info">
+              <h3>SAE Kinematic Mechanism & Chassis</h3>
+              <p>SolidWorks parametric modeling, gear train kinematics, 3D printing prototyping, and structural testing. Won All India Rank 1.</p>
+              <div class="tags">
+                <span class="tag">SAEINDIA</span>
+                <span class="tag">AIR 1</span>
+                <span class="tag">KINEMATICS</span>
                 <span class="tag">PROTOTYPING</span>
               </div>
             </div>
           </article>
 
-          <!-- Project 3 -->
+          <!-- PROJECT 6: INDUSTRIAL PLANT & PIPING LAYOUTS -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <div class="thumb-canvas mold-bg">
-                <svg viewBox="0 0 200 120" width="100%" height="100%">
-                  <rect x="40" y="25" width="120" height="70" rx="4" stroke="#27c7ff" stroke-width="1.5" fill="none"/>
-                  <circle cx="70" cy="50" r="10" stroke="#ffbf3f" fill="none"/>
-                  <circle cx="130" cy="50" r="10" stroke="#ffbf3f" fill="none"/>
-                  <rect x="85" y="40" width="30" height="40" stroke="#39e0a4" fill="none"/>
-                  <line x1="40" y1="60" x2="160" y2="60" stroke="#27c7ff" stroke-dasharray="3 2"/>
-                </svg>
-              </div>
-              <button class="thumb-btn" data-project="mold" aria-label="Open case study">↗</button>
+              <!-- ================= EDITABLE PHOTO #7 ================= -->
+              <img 
+                id="p6-photo"
+                src="images/industrial-plant.jpg" 
+                alt="Industrial Heavy Machinery Plant Layout" 
+                class="project-img"
+                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Industrial+Machinery+Layout'"
+              />
+              <label class="photo-upload-label">
+                📷 Load Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p6-photo')">
+              </label>
+              <button class="thumb-btn" onclick="openCase('nalco')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
-              <h3>Plastic Injection Hand Mold</h3>
-              <p>Creo mold modeling, production drawings, CNC toolpaths, DFMEA and process-flow documentation.</p>
+              <h3>Industrial Machinery & Hydraulics (NALCO)</h3>
+              <p>Heavy machinery maintenance workflow analysis, layout optimization, and plant hydraulics evaluation at NALCO Smelter Plant.</p>
               <div class="tags">
-                <span class="tag">CREO</span>
-                <span class="tag">DFMEA</span>
-                <span class="tag">CNC</span>
-                <span class="tag">MANUFACTURING</span>
-              </div>
-            </div>
-          </article>
-
-          <!-- Project 4 -->
-          <article class="project-card reveal">
-            <div class="project-thumb">
-              <div class="thumb-canvas cfd-bg">
-                <svg viewBox="0 0 200 120" width="100%" height="100%">
-                  <path d="M 10,60 Q 60,10 180,50 L 190,60 L 180,70 Q 60,110 10,60 Z" fill="url(#cfdGrad)" stroke="#ffbf3f"/>
-                  <defs>
-                    <linearGradient id="cfdGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#2333e8"/>
-                      <stop offset="40%" stop-color="#15d7ef"/>
-                      <stop offset="70%" stop-color="#f6f02d"/>
-                      <stop offset="100%" stop-color="#f3471e"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M 30,40 Q 80,30 140,55 M 30,80 Q 80,90 140,65" stroke="#ffffff" stroke-width="1" stroke-dasharray="4 2" fill="none"/>
-                </svg>
-              </div>
-              <button class="thumb-btn" data-project="drdo" aria-label="Open case study">↗</button>
-            </div>
-            <div class="project-info">
-              <h3>DRDO — Supersonic Pressure Analysis</h3>
-              <p>3D modeling, shockwave pressure distributions, CAD assemblies and analytical validation.</p>
-              <div class="tags">
-                <span class="tag">CFD</span>
-                <span class="tag">PRESSURE</span>
-                <span class="tag">CAD</span>
-                <span class="tag">VALIDATION</span>
-              </div>
-            </div>
-          </article>
-
-          <!-- Project 5 -->
-          <article class="project-card reveal">
-            <div class="project-thumb">
-              <div class="thumb-canvas plant-bg">
-                <svg viewBox="0 0 200 120" width="100%" height="100%">
-                  <rect x="30" y="40" width="25" height="50" stroke="#27c7ff" fill="none"/>
-                  <rect x="65" y="25" width="35" height="65" stroke="#ffbf3f" fill="none"/>
-                  <path d="M 110,90 L 125,35 L 140,90" stroke="#27c7ff" fill="none"/>
-                  <line x1="150" y1="45" x2="180" y2="45" stroke="#39e0a4" stroke-width="2"/>
-                  <line x1="150" y1="65" x2="180" y2="65" stroke="#39e0a4" stroke-width="2"/>
-                </svg>
-              </div>
-              <button class="thumb-btn" data-project="nalco" aria-label="Open case study">↗</button>
-            </div>
-            <div class="project-info">
-              <h3>NALCO — Industrial Plant Machinery</h3>
-              <p>Heavy-industrial plant layouts, Six Sigma, troubleshooting and workflow efficiency.</p>
-              <div class="tags">
-                <span class="tag">INDUSTRIAL</span>
+                <span class="tag">NALCO</span>
+                <span class="tag">HYDRAULICS</span>
+                <span class="tag">PLANT DESIGN</span>
                 <span class="tag">SIX SIGMA</span>
-                <span class="tag">LAYOUTS</span>
               </div>
             </div>
           </article>
+
         </div>
       </div>
     </section>
 
-    <!-- Technical Skills & Tools Section -->
+    <!-- Technical Skills Section -->
     <section class="section" id="skills">
       <div class="section-container">
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="hud-line"></span>
-            <h2>Technical Skills & Tools</h2>
+            <h2>Mechanical Skills & Software Competencies</h2>
           </div>
-          <a href="#skills" class="section-link">View All Skills →</a>
         </div>
 
         <div class="skills-grid">
           <div class="skill-card reveal">
-            <div class="skill-icon solidworks-icon">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#e2231a"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.8l6.5 3.25v6.5L12 17.8l-6.5-3.25v-6.5L12 4.8z"/></svg>
-            </div>
+            <div class="skill-icon">⚙️</div>
             <strong>SOLIDWORKS</strong>
-            <small>3D CAD & Assemblies</small>
+            <small>CSWA & CSWP Certified</small>
           </div>
 
           <div class="skill-card reveal">
-            <div class="skill-icon fusion-icon">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#ff6a00"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 3.2l5.5 3.05v6.1L12 17.4l-5.5-3.05v-6.1L12 5.2z"/></svg>
-            </div>
-            <strong>Fusion 360</strong>
-            <small>Parametric Design</small>
+            <div class="skill-icon">🛠️</div>
+            <strong>PTC Creo</strong>
+            <small>Mold Design & Tooling</small>
           </div>
 
           <div class="skill-card reveal">
-            <div class="skill-icon creo-icon">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#7cb342"><path d="M4 4h16v16H4V4zm4 4v8h8V8H8z"/></svg>
-            </div>
-            <strong>Creo</strong>
-            <small>Part & Mold Design</small>
+            <div class="skill-icon">🌊</div>
+            <strong>ANSYS Workbench</strong>
+            <small>FEA Stress & CFD Fluent</small>
           </div>
 
           <div class="skill-card reveal">
-            <div class="skill-icon autocad-icon">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#d32f2f"><path d="M12 2L2 22h4l2-4h8l2 4h4L12 2zm0 6l2.5 5h-5L12 8z"/></svg>
-            </div>
+            <div class="skill-icon">📐</div>
+            <strong>GD&T (ASME Y14.5)</strong>
+            <small>Tolerance Stack-Up Analysis</small>
+          </div>
+
+          <div class="skill-card reveal">
+            <div class="skill-icon">🏭</div>
+            <strong>DFM / DFA</strong>
+            <small>Sheet Metal, Molding, CNC</small>
+          </div>
+
+          <div class="skill-card reveal">
+            <div class="skill-icon">🖥️</div>
             <strong>AutoCAD</strong>
-            <small>2D Drafting & Layouts</small>
-          </div>
-
-          <div class="skill-card reveal">
-            <div class="skill-icon ansys-icon">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#ffb300"><path d="M3 20h18L12 4 3 20zm9-11l4 7H8l4-7z"/></svg>
-            </div>
-            <strong>ANSYS</strong>
-            <small>FEA / CFD</small>
-          </div>
-
-          <div class="skill-card reveal">
-            <div class="skill-icon matlab-icon">
-              <svg viewBox="0 0 24 24" width="36" height="36" fill="#0288d1"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-            </div>
-            <strong>MATLAB</strong>
-            <small>Simulation & Analysis</small>
+            <small>2D Drafting & Schematics</small>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Engineering Workflow Section -->
+    <!-- Mechanical Design Workflow -->
     <section class="section" id="workflow">
       <div class="section-container">
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="hud-line"></span>
-            <h2>Engineering Workflow</h2>
+            <h2>Mechanical Engineering Workflow</h2>
           </div>
         </div>
 
         <div class="workflow-wrapper reveal">
           <div class="workflow-steps">
             <div class="flow-step">
-              <div class="step-icon">🎨</div>
-              <h4>CAD Design</h4>
+              <div class="step-icon">💡</div>
+              <h4>1. Concept & Math</h4>
+              <p>Hand Calculations & Sizing</p>
+            </div>
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="step-icon">🖥️</div>
+              <h4>2. 3D CAD Modeling</h4>
               <p>SolidWorks / Creo</p>
             </div>
             <div class="flow-arrow">→</div>
 
             <div class="flow-step">
-              <div class="step-icon">📦</div>
-              <h4>Assembly</h4>
-              <p>BOM & Packaging</p>
+              <div class="step-icon">📊</div>
+              <h4>3. FEA / CFD Validation</h4>
+              <p>ANSYS Simulation</p>
             </div>
             <div class="flow-arrow">→</div>
 
             <div class="flow-step">
-              <div class="step-icon">🌊</div>
-              <h4>Analysis</h4>
-              <p>FEA / CFD</p>
+              <div class="step-icon">📐</div>
+              <h4>4. DFM & GD&T</h4>
+              <p>2D Engineering Drawings</p>
             </div>
             <div class="flow-arrow">→</div>
 
             <div class="flow-step">
-              <div class="step-icon">⚙️</div>
-              <h4>Manufacturing</h4>
-              <p>DFM / CNC</p>
+              <div class="step-icon">🔧</div>
+              <h4>5. Manufacturing</h4>
+              <p>CNC / Mold / Machining</p>
             </div>
-            <div class="flow-arrow">→</div>
-
-            <div class="flow-step">
-              <div class="step-icon">✅</div>
-              <h4>Validation</h4>
-              <p>Testing & Reports</p>
-            </div>
-          </div>
-
-          <div class="workflow-graphic">
-            <div class="concept-badge">FROM CONCEPT<br>TO REALITY</div>
-            <svg viewBox="0 0 400 180" class="wireframe-jet">
-              <path d="M 20,90 L 120,70 L 250,20 L 320,80 L 380,90 L 320,100 L 250,160 L 120,110 Z" stroke="#27c7ff" stroke-width="1.2" fill="none" stroke-dasharray="5 2"/>
-              <line x1="20" y1="90" x2="380" y2="90" stroke="#ffbf3f" stroke-width="1"/>
-              <line x1="120" y1="70" x2="120" y2="110" stroke="#27c7ff"/>
-              <line x1="250" y1="20" x2="250" y2="160" stroke="#27c7ff"/>
-            </svg>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Professional Grid Section (Experience, Education, Certifications) -->
+    <!-- Experience, Education & Certifications -->
     <section class="section" id="experience">
       <div class="section-container">
         <div class="three-col-grid">
+          
           <!-- Column 1: Experience -->
           <div class="col-card reveal">
             <div class="col-header">
               <span class="col-icon">💼</span>
-              <h3>Professional Experience</h3>
+              <h3>Engineering Experience</h3>
             </div>
             <div class="timeline-list">
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>IG Defence</h4>
-                  <p class="entry-role">Engineer 1 - Mechanical Design | Delhi, India</p>
-                  <span class="entry-date">May 2024 – Present</span>
+                  <h4>Research Intern (Shockwave CFD)</h4>
+                  <p class="entry-role">DRDO | Chandipur</p>
+                  <span class="entry-date">Summer Internship</span>
+                  <p class="entry-sub">High-displacement pressure shockwave modeling and experimental CAD test rig setup.</p>
                 </div>
               </div>
 
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>DRDO</h4>
-                  <p class="entry-role">Summer Intern | Chandipur, Odisha</p>
-                  <span class="entry-date">May 2024 – Jun 2024</span>
+                  <h4>Industrial Trainee</h4>
+                  <p class="entry-role">NALCO | Angul Smelter Plant</p>
+                  <span class="entry-date">Industrial Training</span>
+                  <p class="entry-sub">Plant heavy machinery layouts, maintenance scheduling, and hydraulic fluid systems.</p>
                 </div>
               </div>
 
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>NALCO</h4>
-                  <p class="entry-role">Industrial Trainee | Angul, Odisha</p>
-                  <span class="entry-date">Jun 2023</span>
+                  <h4>Design & Graphics Intern</h4>
+                  <p class="entry-role">SEMS Group</p>
+                  <p class="entry-sub">Technical documentation, product design presentation graphics, and marketing assets.</p>
                 </div>
               </div>
             </div>
-            <a href="#experience" class="btn outline-col">View Full Experience →</a>
           </div>
 
-          <!-- Column 2: Education -->
+          <!-- Column 2: Education & Awards -->
           <div class="col-card reveal">
             <div class="col-header">
               <span class="col-icon">🎓</span>
-              <h3>Education</h3>
+              <h3>Education & Achievements</h3>
             </div>
             <div class="timeline-list">
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>VSSUT</h4>
-                  <p class="entry-role">B.Tech – Mechanical Engineering</p>
-                  <p class="entry-sub">Burla, Odisha | 2026</p>
-                  <span class="entry-highlight">GPA: 8.02</span>
+                  <h4>B.Tech – Mechanical Engineering</h4>
+                  <p class="entry-role">VSSUT, Burla</p>
+                  <span class="entry-date">2022 – 2026</span>
+                  <p class="entry-sub">Core focus on CAD/CAM, Thermodynamics, Fluid Mechanics, Tooling & Machine Design.</p>
                 </div>
               </div>
 
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>Upendra Nath HSS</h4>
-                  <p class="entry-role">Class XII | 2020</p>
-                </div>
-              </div>
-
-              <div class="timeline-entry">
-                <div class="entry-bullet"></div>
-                <div class="entry-details">
-                  <h4>Gandibed Nodal High School</h4>
-                  <p class="entry-role">Class X | 2018</p>
+                  <h4>All India Rank 1 (AIR 1)</h4>
+                  <p class="entry-role">SAEINDIA Southern Section DDC</p>
+                  <p class="entry-sub">Awarded 1st rank nationally for outstanding mechanical chassis & mechanism design.</p>
                 </div>
               </div>
             </div>
-            <a href="#experience" class="btn outline-col">View All Education →</a>
           </div>
 
           <!-- Column 3: Certifications -->
           <div class="col-card reveal">
             <div class="col-header">
               <span class="col-icon">📜</span>
-              <h3>Certifications</h3>
+              <h3>Professional Certifications</h3>
             </div>
             <div class="timeline-list">
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>SolidWorks Industrial Certification</h4>
-                  <p class="entry-sub">CTTC, Bhubaneswar</p>
+                  <h4>SOLIDWORKS CSWA & CSWP</h4>
+                  <p class="entry-sub">Official Dassault Systèmes Certified Associate & Professional in Mechanical Design.</p>
                 </div>
               </div>
 
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>ANSYS Fluent Virtual Internship</h4>
-                  <p class="entry-sub">AICTE</p>
+                  <h4>Industrial Tooling & Mold Design</h4>
+                  <p class="entry-sub">CTTC Bhubaneswar (Creo Tooling, Core/Cavity Extraction, CNC Machining).</p>
                 </div>
               </div>
 
               <div class="timeline-entry">
                 <div class="entry-bullet"></div>
                 <div class="entry-details">
-                  <h4>CNC Toolpath Programming</h4>
-                  <p class="entry-sub">World Steel Association</p>
+                  <h4>Altair CAE Mesh-Mastery Contest</h4>
+                  <p class="entry-sub">Virtual Internship & Simulation Contest certification in Finite Element Analysis.</p>
                 </div>
               </div>
             </div>
-            <a href="#experience" class="btn outline-col">View All Certifications →</a>
           </div>
+
         </div>
       </div>
     </section>
@@ -529,39 +1093,231 @@
   <footer class="footer-section" id="contact">
     <div class="footer-container">
       <div class="quote-banner">
-        <span>— "Build Better. Design Smarter." —</span>
+        <span>— "BRIDGING THE GAP FROM CAD CONCEPT TO PRECISION MANUFACTURING" —</span>
       </div>
       <div class="footer-main">
         <div class="footer-brand">
           <div class="brand-logo">MM</div>
           <div>
             <strong>MANAS MALLIK</strong>
-            <p>Mechanical Design Engineer | Aerospace & UAV Systems</p>
+            <p>Mechanical Design Engineer | CAD, FEA, DFM & Tooling Specialist</p>
           </div>
         </div>
         <div class="footer-links">
-          <a href="https://www.linkedin.com/in/manas-mallik-308767263" target="_blank" rel="noopener" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.64a1.63 1.63 0 1 0 0 3.26 1.63 1.63 0 0 0 0-3.26z"/></svg>
-          </a>
-          <a href="mailto:manasmallik406@gmail.com" aria-label="Email">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-          </a>
-          <a href="resume.pdf" download aria-label="Resume">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          </a>
+          <!-- EDITABLE LINKS -->
+          <a href="https://www.linkedin.com/in/manas-mallik-308767263" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="mailto:manasmallik406@gmail.com">Email Me</a>
+          <a href="resume.pdf" download>Resume</a>
         </div>
       </div>
       <div class="footer-copy">
-        © <span id="current-year"></span> Manas Mallik. All rights reserved.
+        © <span id="current-year"></span> Manas Mallik. All rights reserved. Built for Mechanical Engineering Excellence.
       </div>
     </div>
   </footer>
 
-  <!-- Modal Component for Detailed Case Studies -->
+  <!-- Dynamic Case Study Modal -->
   <div class="modal" id="project-modal" aria-hidden="true">
     <div class="modal-card" id="modal-body" role="dialog" aria-modal="true" aria-labelledby="modal-title"></div>
   </div>
 
-  <script src="script.js" defer></script>
+  <!-- JavaScript Logic -->
+  <script>
+    // ==========================================================================
+    // 1. MECHANICAL CASE STUDY DATA
+    // ==========================================================================
+    const projectCases = {
+      mold: {
+        title: 'Plastic Injection Hand Mold Tooling Design',
+        imgSrc: 'images/injection-mold.jpg',
+        body: 'Designed complete plastic injection hand mold tooling in PTC Creo at CTTC Bhubaneswar. Extracted core and cavity blocks, calculated runner dimensions and gate sizing based on polymer viscosity, generated 3D CNC toolpath paths, and compiled complete DFMEA documentation.',
+        tags: ['PTC CREO', 'MOLD TOOLING', 'DFM', 'CNC MACHINING', 'CTTC']
+      },
+      drdo: {
+        title: 'High-Pressure Flow & Shockwave Modeling (DRDO)',
+        imgSrc: 'images/drdo-shockwave.jpg',
+        body: 'Conducted high-displacement dynamic pressure profile modeling during a research internship at DRDO Chandipur. Modeled fluid-structure interactions and designed physical experimental test rig CAD assemblies for high-velocity pressure testing.',
+        tags: ['DRDO', 'CFD', 'FLUID DYNAMICS', 'TEST RIG CAD', 'SOLIDWORKS']
+      },
+      fea: {
+        title: 'Structural FEA Stress Analysis & Optimization',
+        imgSrc: 'images/fea-analysis.jpg',
+        body: 'Executed static structural, stress concentration, and modal frequency simulations using ANSYS Workbench and Altair tools. Applied topology optimization to reduce structural component weight by 18% while maintaining a minimum factor of safety of 2.2.',
+        tags: ['ANSYS FEA', 'ALTAIR', 'STRESS ANALYSIS', 'TOPOLOGY OPTIMIZATION']
+      },
+      packaging: {
+        title: 'Mechanical Packaging & Sheet Metal Enclosure',
+        imgSrc: 'images/mechanical-enclosure.jpg',
+        body: 'Developed sheet metal chassis assemblies and protective enclosures in SolidWorks. Performed ASME Y14.5 GD&T tolerance stack-up analysis to guarantee zero-interference assembly during manufacturing.',
+        tags: ['SOLIDWORKS', 'SHEET METAL', 'GD&T Y14.5', 'FASTENERS', 'BOM']
+      },
+      sae: {
+        title: 'SAE Kinematic Mechanism & Chassis Design (AIR 1)',
+        imgSrc: 'images/sae-mechanism.jpg',
+        body: 'Engineered mechanical gear transmission mechanisms and load-bearing chassis frames. Conducted rapid 3D printing prototyping, physical stress testing, and secured All India Rank 1 (AIR 1) in the SAEINDIA Southern Section Challenge.',
+        tags: ['SAEINDIA', 'AIR 1', 'KINEMATICS', 'GEAR TRAINS', 'PROTOTYPING']
+      },
+      nalco: {
+        title: 'Industrial Plant Machinery & Hydraulics (NALCO)',
+        imgSrc: 'images/industrial-plant.jpg',
+        body: 'Evaluated heavy industrial machinery layouts and plant hydraulic fluid systems at the NALCO Angul Smelter Plant. Utilized Six Sigma frameworks to reduce machinery downtime and optimize plant maintenance layout efficiency.',
+        tags: ['NALCO', 'HYDRAULIC SYSTEMS', 'PLANT DESIGN', 'SIX SIGMA']
+      }
+    };
+
+    // ==========================================================================
+    // 2. LIVE LOCAL PHOTO PREVIEWER & MODAL LOGIC
+    // ==========================================================================
+    function previewImage(event, targetImgId) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgElement = document.getElementById(targetImgId);
+          if (imgElement) {
+            imgElement.src = e.target.result;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    const modal = document.querySelector('#project-modal');
+    const modalBody = document.querySelector('#modal-body');
+
+    function openCase(key) {
+      const item = projectCases[key];
+      if (!item || !modal || !modalBody) return;
+
+      // Check if user uploaded a local photo preview for this project
+      const currentCardImg = document.querySelector(`#${key === 'mold' ? 'p1-photo' : key === 'drdo' ? 'p2-photo' : key === 'fea' ? 'p3-photo' : key === 'packaging' ? 'p4-photo' : key === 'sae' ? 'p5-photo' : 'p6-photo'}`);
+      const activeSrc = (currentCardImg && currentCardImg.src) ? currentCardImg.src : item.imgSrc;
+
+      modalBody.innerHTML = `
+        <button class="modal-close" type="button" onclick="closeCase()" aria-label="Close">×</button>
+        <div style="color:var(--gold); font-size:10px; font-weight:800; letter-spacing:1px; margin-bottom:8px;">MECHANICAL ENGINEERING CASE STUDY</div>
+        <h2 id="modal-title" style="margin-bottom:14px; font-size:22px; color:#fff;">${item.title}</h2>
+        
+        <div class="modal-img-container">
+          <img src="${activeSrc}" alt="${item.title}" class="modal-img" onerror="this.src='https://via.placeholder.com/700x350/071526/27c7ff?text=Mechanical+CAD+Render+Image'" />
+        </div>
+
+        <p style="color:var(--text-muted); font-size:13.5px; line-height:1.65; margin-bottom:20px;">${item.body}</p>
+        <div class="tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      `;
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCase() {
+      if (!modal) return;
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    modal?.addEventListener('click', e => {
+      if (e.target === modal) closeCase();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeCase();
+    });
+
+    // Scroll Reveal Observer
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ==========================================================================
+    // 3. CAD CANVAS GRID BACKGROUND ANIMATION
+    // ==========================================================================
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let width, height, particles = [];
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        initParticles();
+      }
+
+      window.addEventListener('resize', resize);
+      window.addEventListener('pointermove', (e) => {
+        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+      });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.35;
+          this.vy = (Math.random() - 0.5) * 0.35;
+          this.size = Math.random() * 1.5 + 0.5;
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0) this.x = width;
+          if (this.x > width) this.x = 0;
+          if (this.y < 0) this.y = height;
+          if (this.y > height) this.y = 0;
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(39, 199, 255, 0.35)';
+          ctx.fill();
+        }
+      }
+
+      function initParticles() {
+        particles = [];
+        const count = Math.floor((width * height) / 16000);
+        for (let i = 0; i < count; i++) particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(39, 199, 255, ${0.12 * (1 - dist / 100)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+
+      resize();
+      animate();
+    }
+
+    // Set current year dynamically
+    const yearEl = document.getElementById('current-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
