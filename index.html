@@ -91,7 +91,7 @@
       justify-content: space-between;
     }
 
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 
     .brand-logo {
       width: 42px;
@@ -281,7 +281,6 @@
       border-radius: 4px;
     }
 
-    /* Quick Photo Quick-Loader HUD Banner */
     .photo-helper-bar {
       background: rgba(255, 191, 63, 0.08);
       border: 1px dashed var(--gold);
@@ -381,7 +380,6 @@
       border: 1px solid rgba(39, 199, 255, 0.2);
     }
 
-    /* Inline Local Photo Input Buttons for On-the-Fly Uploads */
     .photo-upload-label {
       position: absolute;
       bottom: 8px;
@@ -403,7 +401,7 @@
     }
 
     /* ==========================================================================
-       5. SKILLS GRID & WORKFLOW
+       5. INTERACTIVE SKILLS GRID & CLICKABLE CARDS
        ========================================================================== */
     .skills-grid {
       display: grid;
@@ -417,14 +415,172 @@
       border-radius: var(--radius);
       padding: 24px;
       text-align: center;
-      transition: border-color 0.2s, transform 0.2s;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
     }
 
-    .skill-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .skill-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-5px);
+      background: var(--bg-card-hover);
+      box-shadow: 0 0 25px rgba(255, 191, 63, 0.15);
+    }
+
+    .skill-card::after {
+      content: 'View Details →';
+      display: block;
+      margin-top: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--cyan);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .skill-card:hover::after {
+      opacity: 1;
+    }
+
     .skill-icon { font-size: 32px; margin-bottom: 12px; }
-    .skill-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
+    .skill-card strong { display: block; font-size: 14px; margin-bottom: 4px; color: #fff; }
     .skill-card small { font-size: 11px; color: var(--text-muted); }
 
+    /* ==========================================================================
+       6. SKILL DETAIL PAGE (DYNAMIC DEDICATED VIEW)
+       ========================================================================== */
+    .skill-detail-view {
+      display: none; /* Controlled by JS */
+      position: relative;
+      z-index: 10;
+      padding: 50px 24px;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      min-height: 80vh;
+      animation: fadeInPage 0.35s ease-in-out forwards;
+    }
+
+    @keyframes fadeInPage {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .back-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(39, 199, 255, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 8px 18px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      transition: all 0.2s;
+    }
+
+    .back-nav-btn:hover {
+      background: var(--cyan);
+      color: #030712;
+      transform: translateX(-4px);
+    }
+
+    .skill-detail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: var(--shadow-hud);
+    }
+
+    .skill-header-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--border-line-light);
+      padding-bottom: 24px;
+      margin-bottom: 28px;
+    }
+
+    .skill-header-icon {
+      font-size: 48px;
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      background: rgba(255, 191, 63, 0.1);
+      border: 1px solid var(--gold);
+      display: grid;
+      place-items: center;
+    }
+
+    .skill-title-group h1 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .skill-title-group p { color: var(--cyan); font-weight: 600; font-size: 14px; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+    }
+
+    .detail-box {
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid var(--border-line-light);
+      border-radius: 10px;
+      padding: 24px;
+    }
+
+    .detail-box h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .detail-list li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .detail-list li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      font-weight: 900;
+    }
+
+    .projects-applied-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .app-item {
+      background: #040e1a;
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+
+    .app-item strong { display: block; font-size: 13px; color: #fff; margin-bottom: 4px; }
+    .app-item p { font-size: 12px; color: var(--text-muted); }
+
+    /* Workflow & Col Grids */
     .workflow-wrapper {
       background: var(--bg-card);
       border: 1px solid var(--border-line);
@@ -446,9 +602,6 @@
     .flow-step p { font-size: 11px; color: var(--text-muted); }
     .flow-arrow { color: var(--gold); font-size: 20px; font-weight: 900; }
 
-    /* ==========================================================================
-       6. THREE-COLUMN TIMELINE (EXPERIENCE, EDUCATION, CERTIFICATIONS)
-       ========================================================================== */
     .three-col-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -483,11 +636,8 @@
     .entry-role { font-size: 11px; color: var(--text-main); }
     .entry-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .entry-date { font-size: 10px; color: var(--cyan); display: block; margin-top: 2px; }
-    .entry-highlight { font-size: 11px; color: var(--gold); font-weight: 800; display: block; margin-top: 2px; }
 
-    /* ==========================================================================
-       7. FOOTER & MODAL
-       ========================================================================== */
+    /* Footer & Modal */
     .footer-section {
       border-top: 1px solid var(--border-line);
       padding: 40px 24px;
@@ -515,7 +665,6 @@
       padding-top: 16px;
     }
 
-    /* Scroll Animations & Dynamic Modal */
     .reveal {
       opacity: 0;
       transform: translateY(20px);
@@ -560,6 +709,7 @@
 
     @media (max-width: 992px) {
       .hero-container { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
       .three-col-grid { grid-template-columns: 1fr; }
       .nav-menu { display: none; }
     }
@@ -580,23 +730,22 @@
   <!-- Top Navigation Header -->
   <header class="navbar">
     <div class="nav-container">
-      <a href="#home" class="brand">
+      <div class="brand" onclick="navigateToHome()">
         <div class="brand-logo">MM</div>
         <div class="brand-text">
           <span class="brand-name">MANAS MALLIK</span>
           <span class="brand-title">Mechanical Design Engineer</span>
         </div>
-      </a>
+      </div>
       <nav class="nav-menu">
-        <a href="#home" class="nav-link active">Home</a>
-        <a href="#projects" class="nav-link">Projects</a>
-        <a href="#skills" class="nav-link">Skills</a>
-        <a href="#workflow" class="nav-link">Workflow</a>
-        <a href="#experience" class="nav-link">Experience</a>
-        <a href="#contact" class="nav-link">Contact</a>
+        <a href="#home" class="nav-link active" onclick="navigateToHome()">Home</a>
+        <a href="#projects" class="nav-link" onclick="navigateToHome('#projects')">Projects</a>
+        <a href="#skills" class="nav-link" onclick="navigateToHome('#skills')">Skills</a>
+        <a href="#workflow" class="nav-link" onclick="navigateToHome('#workflow')">Workflow</a>
+        <a href="#experience" class="nav-link" onclick="navigateToHome('#experience')">Experience</a>
+        <a href="#contact" class="nav-link" onclick="navigateToHome('#contact')">Contact</a>
       </nav>
       <div class="nav-actions">
-        <!-- EDITABLE RESUME LINK: Replace 'resume.pdf' with your PDF path -->
         <a href="resume.pdf" download class="btn outline-sm">
           <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           Download CV
@@ -605,7 +754,11 @@
     </div>
   </header>
 
-  <main>
+  <!-- ==========================================================================
+     MAIN PORTFOLIO CONTENT VIEW (HOME)
+     ========================================================================== -->
+  <div id="main-portfolio-view">
+    
     <!-- Hero Section -->
     <section class="hero-section" id="home">
       <div class="hero-container">
@@ -659,8 +812,6 @@
           <div class="cad-viewport">
             <div class="grid-overlay"></div>
             
-            <!-- ================= EDITABLE PHOTO #1 (HERO IMAGE) ================= -->
-            <!-- Instructions: Replace 'images/hero-assembly.jpg' with your photo URL or file path -->
             <img 
               id="hero-photo"
               src="images/hero-assembly.jpg" 
@@ -690,7 +841,7 @@
       <div class="section-container">
         
         <div class="photo-helper-bar">
-          <span>💡 <strong>Quick Photo Tester:</strong> Click <em>"📷 Load Local Photo"</em> on any project card below to instantly preview your CAD renders right inside your browser!</span>
+          <span>💡 <strong>Quick Photo Tester:</strong> Click <em>"📷 Load Local Photo"</em> on any project card below to preview your CAD renders locally in your browser.</span>
         </div>
 
         <div class="section-header">
@@ -702,21 +853,11 @@
 
         <div class="projects-grid">
           
-          <!-- PROJECT 1: MOLD TOOLING -->
+          <!-- PROJECT 1 -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <!-- ================= EDITABLE PHOTO #2 ================= -->
-              <img 
-                id="p1-photo"
-                src="images/injection-mold.jpg" 
-                alt="Plastic Injection Mold Design" 
-                class="project-img"
-                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Injection+Mold+Tooling+CAD'"
-              />
-              <label class="photo-upload-label">
-                📷 Load Photo
-                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p1-photo')">
-              </label>
+              <img id="p1-photo" src="images/injection-mold.jpg" alt="Plastic Injection Mold Design" class="project-img" onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Injection+Mold+Tooling+CAD'" />
+              <label class="photo-upload-label">📷 Load Photo <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p1-photo')"></label>
               <button class="thumb-btn" onclick="openCase('mold')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
@@ -731,21 +872,11 @@
             </div>
           </article>
 
-          <!-- PROJECT 2: DRDO SHOCKWAVE CFD -->
+          <!-- PROJECT 2 -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <!-- ================= EDITABLE PHOTO #3 ================= -->
-              <img 
-                id="p2-photo"
-                src="images/drdo-shockwave.jpg" 
-                alt="DRDO Pressure Shockwave Simulation" 
-                class="project-img"
-                onerror="this.src='https://via.placeholder.com/600x400/071526/071526/27c7ff?text=DRDO+Shockwave+CFD+Model'"
-              />
-              <label class="photo-upload-label">
-                📷 Load Photo
-                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p2-photo')">
-              </label>
+              <img id="p2-photo" src="images/drdo-shockwave.jpg" alt="DRDO Pressure Shockwave Simulation" class="project-img" onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=DRDO+Shockwave+CFD+Model'" />
+              <label class="photo-upload-label">📷 Load Photo <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p2-photo')"></label>
               <button class="thumb-btn" onclick="openCase('drdo')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
@@ -760,21 +891,11 @@
             </div>
           </article>
 
-          <!-- PROJECT 3: STRUCTURAL FEA & OPTIMIZATION -->
+          <!-- PROJECT 3 -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <!-- ================= EDITABLE PHOTO #4 ================= -->
-              <img 
-                id="p3-photo"
-                src="images/fea-analysis.jpg" 
-                alt="ANSYS FEA Structural Stress Analysis" 
-                class="project-img"
-                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=ANSYS+FEA+Stress+Analysis'"
-              />
-              <label class="photo-upload-label">
-                📷 Load Photo
-                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p3-photo')">
-              </label>
+              <img id="p3-photo" src="images/fea-analysis.jpg" alt="ANSYS FEA Structural Stress Analysis" class="project-img" onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=ANSYS+FEA+Stress+Analysis'" />
+              <label class="photo-upload-label">📷 Load Photo <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p3-photo')"></label>
               <button class="thumb-btn" onclick="openCase('fea')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
@@ -789,21 +910,11 @@
             </div>
           </article>
 
-          <!-- PROJECT 4: MECHANICAL PACKAGING & SHEET METAL -->
+          <!-- PROJECT 4 -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <!-- ================= EDITABLE PHOTO #5 ================= -->
-              <img 
-                id="p4-photo"
-                src="images/mechanical-enclosure.jpg" 
-                alt="Sheet Metal Mechanical Enclosure" 
-                class="project-img"
-                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Mechanical+Packaging+Enclosure'"
-              />
-              <label class="photo-upload-label">
-                📷 Load Photo
-                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p4-photo')">
-              </label>
+              <img id="p4-photo" src="images/mechanical-enclosure.jpg" alt="Sheet Metal Mechanical Enclosure" class="project-img" onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Mechanical+Packaging+Enclosure'" />
+              <label class="photo-upload-label">📷 Load Photo <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p4-photo')"></label>
               <button class="thumb-btn" onclick="openCase('packaging')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
@@ -818,21 +929,11 @@
             </div>
           </article>
 
-          <!-- PROJECT 5: SAEINDIA DDC MECHANISM DESIGN -->
+          <!-- PROJECT 5 -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <!-- ================= EDITABLE PHOTO #6 ================= -->
-              <img 
-                id="p5-photo"
-                src="images/sae-mechanism.jpg" 
-                alt="SAE Kinematic Mechanism Assembly" 
-                class="project-img"
-                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=SAE+Mechanism+%26+Chassis+CAD'"
-              />
-              <label class="photo-upload-label">
-                📷 Load Photo
-                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p5-photo')">
-              </label>
+              <img id="p5-photo" src="images/sae-mechanism.jpg" alt="SAE Kinematic Mechanism Assembly" class="project-img" onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=SAE+Mechanism+%26+Chassis+CAD'" />
+              <label class="photo-upload-label">📷 Load Photo <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p5-photo')"></label>
               <button class="thumb-btn" onclick="openCase('sae')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
@@ -847,21 +948,11 @@
             </div>
           </article>
 
-          <!-- PROJECT 6: INDUSTRIAL PLANT & PIPING LAYOUTS -->
+          <!-- PROJECT 6 -->
           <article class="project-card reveal">
             <div class="project-thumb">
-              <!-- ================= EDITABLE PHOTO #7 ================= -->
-              <img 
-                id="p6-photo"
-                src="images/industrial-plant.jpg" 
-                alt="Industrial Heavy Machinery Plant Layout" 
-                class="project-img"
-                onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Industrial+Machinery+Layout'"
-              />
-              <label class="photo-upload-label">
-                📷 Load Photo
-                <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p6-photo')">
-              </label>
+              <img id="p6-photo" src="images/industrial-plant.jpg" alt="Industrial Heavy Machinery Plant Layout" class="project-img" onerror="this.src='https://via.placeholder.com/600x400/071526/27c7ff?text=Industrial+Machinery+Layout'" />
+              <label class="photo-upload-label">📷 Load Photo <input type="file" accept="image/*" style="display:none;" onchange="previewImage(event, 'p6-photo')"></label>
               <button class="thumb-btn" onclick="openCase('nalco')" aria-label="Open project case study">↗</button>
             </div>
             <div class="project-info">
@@ -880,7 +971,7 @@
       </div>
     </section>
 
-    <!-- Technical Skills Section -->
+    <!-- Technical Skills Section (INTERACTIVE - CLICK A CARD TO LAND ON DETAIL PAGE) -->
     <section class="section" id="skills">
       <div class="section-container">
         <div class="section-header">
@@ -888,40 +979,41 @@
             <span class="hud-line"></span>
             <h2>Mechanical Skills & Software Competencies</h2>
           </div>
+          <span style="font-size:12px; color:var(--cyan);">👇 Click any skill to open its full detail page</span>
         </div>
 
         <div class="skills-grid">
-          <div class="skill-card reveal">
+          <div class="skill-card reveal" onclick="openSkillPage('solidworks')">
             <div class="skill-icon">⚙️</div>
             <strong>SOLIDWORKS</strong>
             <small>CSWA & CSWP Certified</small>
           </div>
 
-          <div class="skill-card reveal">
+          <div class="skill-card reveal" onclick="openSkillPage('creo')">
             <div class="skill-icon">🛠️</div>
             <strong>PTC Creo</strong>
             <small>Mold Design & Tooling</small>
           </div>
 
-          <div class="skill-card reveal">
+          <div class="skill-card reveal" onclick="openSkillPage('ansys')">
             <div class="skill-icon">🌊</div>
             <strong>ANSYS Workbench</strong>
             <small>FEA Stress & CFD Fluent</small>
           </div>
 
-          <div class="skill-card reveal">
+          <div class="skill-card reveal" onclick="openSkillPage('gdt')">
             <div class="skill-icon">📐</div>
             <strong>GD&T (ASME Y14.5)</strong>
             <small>Tolerance Stack-Up Analysis</small>
           </div>
 
-          <div class="skill-card reveal">
+          <div class="skill-card reveal" onclick="openSkillPage('dfm')">
             <div class="skill-icon">🏭</div>
             <strong>DFM / DFA</strong>
             <small>Sheet Metal, Molding, CNC</small>
           </div>
 
-          <div class="skill-card reveal">
+          <div class="skill-card reveal" onclick="openSkillPage('autocad')">
             <div class="skill-icon">🖥️</div>
             <strong>AutoCAD</strong>
             <small>2D Drafting & Schematics</small>
@@ -985,7 +1077,6 @@
       <div class="section-container">
         <div class="three-col-grid">
           
-          <!-- Column 1: Experience -->
           <div class="col-card reveal">
             <div class="col-header">
               <span class="col-icon">💼</span>
@@ -1023,7 +1114,6 @@
             </div>
           </div>
 
-          <!-- Column 2: Education & Awards -->
           <div class="col-card reveal">
             <div class="col-header">
               <span class="col-icon">🎓</span>
@@ -1051,7 +1141,6 @@
             </div>
           </div>
 
-          <!-- Column 3: Certifications -->
           <div class="col-card reveal">
             <div class="col-header">
               <span class="col-icon">📜</span>
@@ -1087,6 +1176,43 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- ==========================================================================
+     DYNAMIC DEDICATED SKILL / SECTION PAGE VIEW (LANDS HERE ON CLICK)
+     ========================================================================== -->
+  <main class="skill-detail-view" id="skill-detail-page">
+    <button class="back-nav-btn" onclick="navigateToHome('#skills')">
+      ← Back to Skills & Main Portfolio
+    </button>
+
+    <div class="skill-detail-card">
+      <div class="skill-header-row">
+        <div class="skill-header-icon" id="skill-page-icon">⚙️</div>
+        <div class="skill-title-group">
+          <h1 id="skill-page-title">SOLIDWORKS</h1>
+          <p id="skill-page-subtitle">CSWA & CSWP Certified Parametric Design & Assembly Expert</p>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <!-- Where I Learned It -->
+        <div class="detail-box">
+          <h3>🎓 Where & How I Learned It</h3>
+          <ul class="detail-list" id="skill-page-learned">
+            <!-- Populated dynamically via JS -->
+          </ul>
+        </div>
+
+        <!-- Where I Used & Applied It -->
+        <div class="detail-box">
+          <h3>🚀 Real-World Engineering Applications</h3>
+          <div class="projects-applied-list" id="skill-page-applied">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Footer Section -->
@@ -1104,7 +1230,6 @@
           </div>
         </div>
         <div class="footer-links">
-          <!-- EDITABLE LINKS -->
           <a href="https://www.linkedin.com/in/manas-mallik-308767263" target="_blank" rel="noopener">LinkedIn</a>
           <a href="mailto:manasmallik406@gmail.com">Email Me</a>
           <a href="resume.pdf" download>Resume</a>
@@ -1124,7 +1249,177 @@
   <!-- JavaScript Logic -->
   <script>
     // ==========================================================================
-    // 1. MECHANICAL CASE STUDY DATA
+    // 1. DETAILED SKILLS & LEARNING/APPLICATION DATABASE
+    // ==========================================================================
+    const skillsData = {
+      solidworks: {
+        title: 'SOLIDWORKS 3D Parametric Design',
+        subtitle: 'CSWA & CSWP Certified in Mechanical Design & Assemblies',
+        icon: '⚙️',
+        learned: [
+          'Pursued structured course modules in Mechanical CAD during B.Tech at VSSUT Burla.',
+          'Self-engineered over 100+ complex 3D parametric components, weldments, and motion assemblies.',
+          'Earned official CSWA (Certified SOLIDWORKS Associate) and CSWP (Certified SOLIDWORKS Professional) credentials from Dassault Systèmes.'
+        ],
+        applied: [
+          {
+            project: 'SAEINDIA Drone & Kinematic Mechanism (AIR 1)',
+            desc: 'Designed parametric chassis frames, gear transmission kinematics, and custom mountings that earned All India Rank 1.'
+          },
+          {
+            project: 'DRDO High-Velocity Test Rig Design',
+            desc: 'Engineered physical CAD test rig assemblies for pressure shockwave validation during DRDO summer research internship.'
+          },
+          {
+            project: 'Sheet Metal Chassis & Packaging',
+            desc: 'Modeled bent sheet metal enclosures, fasteners, and internal PCB mounting standoffs with zero interference.'
+          }
+        ]
+      },
+      creo: {
+        title: 'PTC Creo Tooling & Mold Design',
+        subtitle: 'Core/Cavity Extraction & Plastic Injection Hand Mold Specialist',
+        icon: '🛠️',
+        learned: [
+          'Underwent intensive industrial hands-on training at CTTC (Central Tool Room & Training Centre), Bhubaneswar.',
+          'Mastered surface modeling, parting line selection, draft analysis, and core/cavity block extraction techniques.'
+        ],
+        applied: [
+          {
+            project: 'Plastic Injection Hand Mold Tooling',
+            desc: 'Extracted core/cavity inserts for plastic components, calculated shrinkage allowances, runner/gate dimensions, and generated CNC toolpaths.'
+          },
+          {
+            project: 'CTTC Tooling Case Studies',
+            desc: 'Completed production-grade 2D engineering drawings with geometric tolerances for toolmakers and mold shops.'
+          }
+        ]
+      },
+      ansys: {
+        title: 'ANSYS Workbench & Simulation (FEA & CFD)',
+        subtitle: 'Static Structural, Modal Analysis & CFD Shockwave Simulation',
+        icon: '🌊',
+        learned: [
+          'Studied Finite Element Methods and Computational Fluid Dynamics in VSSUT Mechanical Department labs.',
+          'Participated in Altair Virtual Internships and the Mesh-Mastery Simulation Contest.'
+        ],
+        applied: [
+          {
+            project: 'DRDO Shockwave CFD Flow Modeling',
+            desc: 'Simulated high-pressure fluid shockwave distribution and velocity vectors across high-speed test geometries.'
+          },
+          {
+            project: 'Structural Stress & Topology Optimization',
+            desc: 'Ran ANSYS static structural stress analysis on structural brackets, achieving an 18% weight reduction while keeping FOS ≥ 2.2.'
+          }
+        ]
+      },
+      gdt: {
+        title: 'GD&T (ASME Y14.5 Standard)',
+        subtitle: 'Geometric Dimensioning, Tolerancing & Stack-Up Analysis',
+        icon: '📐',
+        learned: [
+          'Mastered ASME Y14.5 standards through advanced mechanical design coursework and CTTC industrial drafting training.'
+        ],
+        applied: [
+          {
+            project: 'Tolerance Stack-Up Analysis',
+            desc: 'Performed worst-case and RSS (Root Sum Squared) tolerance calculations for multi-part mechanical assemblies.'
+          },
+          {
+            project: 'Production Drawing Deliverables',
+            desc: 'Applied Datums, Feature Control Frames, Runout, Cylindricity, and True Position tolerances to precision machining blueprints.'
+          }
+        ]
+      },
+      dfm: {
+        title: 'Design for Manufacturing & Assembly (DFM / DFA)',
+        subtitle: 'Optimizing Parts for Injection Molding, CNC Machining & Sheet Metal',
+        icon: '🏭',
+        learned: [
+          'Learned practically through CTTC Bhubaneswar mold manufacturing labs and industrial site visits at NALCO Angul.'
+        ],
+        applied: [
+          {
+            project: 'Plastic Injection Part Design',
+            desc: 'Incorporated uniform wall thickness, rib designs, draft angles (1°-2°), and undercut eliminations to prevent sink marks.'
+          },
+          {
+            project: 'Sheet Metal & Fastener Packaging',
+            desc: 'Designed bend reliefs, standard hole clearances, and tool access clearance for assembly operators.'
+          }
+        ]
+      },
+      autocad: {
+        title: 'AutoCAD 2D Engineering & Drafting',
+        subtitle: 'Schematics, P&ID Layouts & Production Detail Drawings',
+        icon: '🖥️',
+        learned: [
+          'Trained in orthographic projections, isometric views, and layer management during foundational engineering studies.'
+        ],
+        applied: [
+          {
+            project: 'NALCO Smelter Plant Heavy Machinery Layouts',
+            desc: 'Evaluated machinery floor layouts, hydraulic piping routes, and equipment maintenance access spaces at NALCO Angul.'
+          },
+          {
+            project: '2D Manufacturing Blueprints',
+            desc: 'Drafted detailed shop-floor drawings for lathe, milling, and CNC machining processes.'
+          }
+        ]
+      }
+    };
+
+    // ==========================================================================
+    // 2. PAGE SWITCHING / LANDING LOGIC
+    // ==========================================================================
+    const mainView = document.getElementById('main-portfolio-view');
+    const skillPage = document.getElementById('skill-detail-page');
+
+    function openSkillPage(skillKey) {
+      const skill = skillsData[skillKey];
+      if (!skill) return;
+
+      // Populate Page Elements
+      document.getElementById('skill-page-icon').textContent = skill.icon;
+      document.getElementById('skill-page-title').textContent = skill.title;
+      document.getElementById('skill-page-subtitle').textContent = skill.subtitle;
+
+      // Where Learned
+      const learnedList = document.getElementById('skill-page-learned');
+      learnedList.innerHTML = skill.learned.map(item => `<li>${item}</li>`).join('');
+
+      // Where Applied
+      const appliedList = document.getElementById('skill-page-applied');
+      appliedList.innerHTML = skill.applied.map(item => `
+        <div class="app-item">
+          <strong>📌 ${item.project}</strong>
+          <p>${item.desc}</p>
+        </div>
+      `).join('');
+
+      // Hide main view & Show detail sub-page
+      mainView.style.display = 'none';
+      skillPage.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function navigateToHome(targetHash) {
+      skillPage.style.display = 'none';
+      mainView.style.display = 'block';
+
+      if (targetHash) {
+        setTimeout(() => {
+          const el = document.querySelector(targetHash);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // ==========================================================================
+    // 3. PROJECT CASE STUDIES DATA & MODAL LOGIC
     // ==========================================================================
     const projectCases = {
       mold: {
@@ -1165,18 +1460,13 @@
       }
     };
 
-    // ==========================================================================
-    // 2. LIVE LOCAL PHOTO PREVIEWER & MODAL LOGIC
-    // ==========================================================================
     function previewImage(event, targetImgId) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
           const imgElement = document.getElementById(targetImgId);
-          if (imgElement) {
-            imgElement.src = e.target.result;
-          }
+          if (imgElement) imgElement.src = e.target.result;
         };
         reader.readAsDataURL(file);
       }
@@ -1189,7 +1479,6 @@
       const item = projectCases[key];
       if (!item || !modal || !modalBody) return;
 
-      // Check if user uploaded a local photo preview for this project
       const currentCardImg = document.querySelector(`#${key === 'mold' ? 'p1-photo' : key === 'drdo' ? 'p2-photo' : key === 'fea' ? 'p3-photo' : key === 'packaging' ? 'p4-photo' : key === 'sae' ? 'p5-photo' : 'p6-photo'}`);
       const activeSrc = (currentCardImg && currentCardImg.src) ? currentCardImg.src : item.imgSrc;
 
@@ -1197,11 +1486,9 @@
         <button class="modal-close" type="button" onclick="closeCase()" aria-label="Close">×</button>
         <div style="color:var(--gold); font-size:10px; font-weight:800; letter-spacing:1px; margin-bottom:8px;">MECHANICAL ENGINEERING CASE STUDY</div>
         <h2 id="modal-title" style="margin-bottom:14px; font-size:22px; color:#fff;">${item.title}</h2>
-        
         <div class="modal-img-container">
           <img src="${activeSrc}" alt="${item.title}" class="modal-img" onerror="this.src='https://via.placeholder.com/700x350/071526/27c7ff?text=Mechanical+CAD+Render+Image'" />
         </div>
-
         <p style="color:var(--text-muted); font-size:13.5px; line-height:1.65; margin-bottom:20px;">${item.body}</p>
         <div class="tags">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
       `;
@@ -1218,13 +1505,8 @@
       document.body.style.overflow = '';
     }
 
-    modal?.addEventListener('click', e => {
-      if (e.target === modal) closeCase();
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeCase();
-    });
+    modal?.addEventListener('click', e => { if (e.target === modal) closeCase(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCase(); });
 
     // Scroll Reveal Observer
     const revealObserver = new IntersectionObserver((entries) => {
@@ -1235,9 +1517,7 @@
 
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-    // ==========================================================================
-    // 3. CAD CANVAS GRID BACKGROUND ANIMATION
-    // ==========================================================================
+    // Background Particles Canvas
     const canvas = document.getElementById('bg-canvas');
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -1263,16 +1543,11 @@
           this.vy = (Math.random() - 0.5) * 0.35;
           this.size = Math.random() * 1.5 + 0.5;
         }
-
         update() {
-          this.x += this.vx;
-          this.y += this.vy;
-          if (this.x < 0) this.x = width;
-          if (this.x > width) this.x = 0;
-          if (this.y < 0) this.y = height;
-          if (this.y > height) this.y = 0;
+          this.x += this.vx; this.y += this.vy;
+          if (this.x < 0) this.x = width; if (this.x > width) this.x = 0;
+          if (this.y < 0) this.y = height; if (this.y > height) this.y = 0;
         }
-
         draw() {
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -1292,12 +1567,10 @@
         for (let i = 0; i < particles.length; i++) {
           particles[i].update();
           particles[i].draw();
-
           for (let j = i + 1; j < particles.length; j++) {
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-
             if (dist < 100) {
               ctx.beginPath();
               ctx.moveTo(particles[i].x, particles[i].y);
@@ -1310,12 +1583,10 @@
         }
         requestAnimationFrame(animate);
       }
-
       resize();
       animate();
     }
 
-    // Set current year dynamically
     const yearEl = document.getElementById('current-year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
   </script>
