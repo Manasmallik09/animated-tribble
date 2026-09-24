@@ -1,0 +1,16 @@
+<!-- The id="projects" enables the https://manasmallik09.github.io/animated-tribble/#projects anchor link -->
+<section id="projects">
+  <h2>Featured Projects</h2>
+
+  <div class="project-item">
+    <!-- Clicking the image opens the high-resolution photo in a new tab -->
+    <a href="./assets/images/project-photo.png" target="_blank" rel="noopener noreferrer">
+      <img 
+        src="./assets/images/project-photo.png" 
+        alt="Project Preview" 
+        style="max-width: 100%; height: auto; border-radius: 8px; cursor: pointer;"
+      />
+    </a>
+    <p><b>SOLIDWORKS & CAE Simulation Project</b></p>
+  </div>
+</section>
