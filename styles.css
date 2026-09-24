@@ -1,68 +1,40 @@
-/* 1. Animated Panning Blueprint Grid */
-@keyframes pan-grid {
-  0% { background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px; }
-  100% { background-position: 99px 99px, 99px 99px, 19px 19px, 19px 19px; }
-}
-
+/* --- Raafay-Style Obsidian Background & Spotlight --- */
 body {
   margin: 0;
   color: var(--text);
-  background-color: #080c11;
-  background-image: 
-    linear-gradient(rgba(39, 199, 255, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(39, 199, 255, 0.15) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-color: #030712; /* Pitch dark obsidian tone */
   font: 14px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
-  animation: pan-grid 35s linear infinite; /* Smooth, continuous grid movement */
+  position: relative;
 }
 
-/* Vignette shadow to give depth to the grid */
-body:before {
-  content: "";
+/* Background Canvas Layer */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Dynamic Cursor Glow Spotlight */
+#mouse-glow {
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, transparent 10%, #04080b 100%);
   z-index: 1;
-}
-
-/* 2. CRT / Scanner Sweep Overlay */
-@keyframes scanlines {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 100vh; }
-}
-
-body:after {
-  content: "";
-  position: fixed;
-  inset: 0;
   pointer-events: none;
-  z-index: 50;
-  opacity: 0.15;
-  background: linear-gradient(rgba(39, 199, 255, 0.3) 1px, transparent 2px);
-  background-size: 100% 5px;
-  animation: scanlines 10s linear infinite;
+  background: radial-gradient(
+    650px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(39, 199, 255, 0.08),
+    transparent 80%
+  );
+  transition: opacity 0.3s ease;
 }
 
-.main, .sidebar, .modal { z-index: 2; position: relative; }
-
-/* 3. SVG Live-Drawing Animation on Hover */
-@keyframes draw-blueprint {
-  0% { stroke-dashoffset: 150; opacity: 0; filter: drop-shadow(0 0 0 transparent); }
-  50% { opacity: 1; }
-  100% { stroke-dashoffset: 0; filter: drop-shadow(0 0 10px rgba(39, 199, 255, 0.8)); }
-}
-
-.tool-icon svg {
-  stroke-dasharray: 150;
-  stroke-dashoffset: 0;
-  transition: stroke 0.3s ease;
-}
-
-.tool:hover .tool-icon svg {
-  stroke: var(--cyan);
-  animation: draw-blueprint 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+/* Ensure UI elements sit above the background FX */
+.sidebar, .main, .topbar, .modal {
+  position: relative;
+  z-index: 2;
 }
